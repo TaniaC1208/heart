@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Be My Valentine? ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffeef2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .heart {
+            position: absolute;
+            color: #ff4d6d;
+            font-size: 20px;
+            top: -10%;
+            user-select: none;
+            z-index: 0;
+            animation: float 5s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 3;
+            border: 2px solid #ffb3c1;
+        }
+
+        h1 { color: #c9184a; margin-bottom: 2rem; }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #yesBtn { background-color: #ff4d6d; color: white; transition: 0.2s; }
+        #yesBtn:hover { transform: scale(1.1); }
+
+        #noBtn {
+            background-color: #a4133c;
+            color: white;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks"></canvas>
+    <div id="heart-bg"></div>
+
+    <div class="container" id="mainCard">
+        <h1>Will you be my Valentine? 🌹</h1>
+        <div class="btn-container">
+            <button id="yesBtn" onclick="celebrate()">Yes!</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+
+        // Resize canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 1. The "No" button dodge
+        noBtn.addEventListener('mouseover', () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        });
+
+        // 2. Firework Logic
+        let particles = [];
+        function createFirework(x, y) {
+            const colors = ['#ff4d6d', '#ff758f', '#ffb3c1', '#c9184a', '#fff'];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x, y,
+                    dx: (Math.random() - 0.5) * 8,
+                    dy: (Math.random() - 0.5) * 8,
+                    size: Math.random() * 3 + 1,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 100
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.05; // gravity
+                p.life--;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.life <= 0) particles.splice(i, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        // 3. The Celebration
+        function celebrate() {
+            document.getElementById('mainCard').innerHTML = `
+                <h1>I knew you'd say yes babes! ❤️</h1>
+                <p style="font-size: 1.2rem; color: #c9184a;">See you on the 14th, My Love<3</p>
+            `;
+            
+            // Start the fireworks loop
+            animate();
+            setInterval(() => {
+                createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
+            }, 300);
+        }
+
+        // 4. Background Hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHeart, 300);
+    </script>
+</body>
+</html>
